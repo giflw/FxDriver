@@ -144,7 +144,10 @@ public class FxElement implements WebElement, Locatable
     @Override
     public boolean isSelected()
     {
-        return false;
+        if (node instanceof Toggle)
+            return ((Toggle) node).isSelected();
+        else
+            return false;
     }
 
     @Override
