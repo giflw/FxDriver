@@ -15,7 +15,6 @@
  */
 package com._1c.qa.selenium.fxdriver;
 
-import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
 import org.openqa.selenium.remote.server.SeleniumServer;
 

@@ -17,10 +17,11 @@ package com._1c.qa.selenium.fxdriver;
 
 import com._1c.qa.selenium.fxdriver.robot.IMouseFxRobot;
 import javafx.scene.Node;
+
+import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.PointerInput.MouseButton;
-import org.openqa.selenium.interactions.internal.Coordinates;
 
 public class FxMouse implements Mouse
 {
@@ -62,27 +63,39 @@ public class FxMouse implements Mouse
     @Override
     public void mouseDown(Coordinates where)
     {
-        this.robot.move(where.onScreen().x, where.onScreen().y).mouseDown(PointerInput.MouseButton.LEFT);
+    	if (where != null) {
+    		this.robot.move(where.onScreen().x, where.onScreen().y);
+    	}
+    	this.robot.mouseDown(PointerInput.MouseButton.LEFT);
     }
 
     @Override
     public void mouseUp(Coordinates where)
     {
-        this.robot.move(where.onScreen().x, where.onScreen().y).mouseUp(PointerInput.MouseButton.LEFT);
+    	if (where != null) {
+    		this.robot.move(where.onScreen().x, where.onScreen().y);
+    	}
+    	this.robot.mouseUp(PointerInput.MouseButton.LEFT);
     }
 
     @Override
     public void mouseMove(Coordinates where)
     {
-        NodeUtils.scrollIntoView((Node)where.getAuxiliary());
-        this.robot.move(where.onScreen().x, where.onScreen().y);
+    	if (where != null) {
+	        NodeUtils.scrollIntoView((Node)where.getAuxiliary());
+	        this.robot.move(where.onScreen().x, where.onScreen().y);
+    	}
     }
 
     @Override
     public void mouseMove(Coordinates where, long xOffset, long yOffset)
     {
-        NodeUtils.scrollIntoView((Node)where.getAuxiliary());
-        this.robot.move((int)(where.onScreen().x + xOffset), (int)(where.onScreen().y + yOffset));
+    	if (where != null) {
+	        NodeUtils.scrollIntoView((Node)where.getAuxiliary());
+	        this.robot.move((int)(where.onScreen().x + xOffset), (int)(where.onScreen().y + yOffset));
+    	} else {
+    		this.robot.move((int) xOffset, (int) yOffset);
+    	}
     }
 
     @Override

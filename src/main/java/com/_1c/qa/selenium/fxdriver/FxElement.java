@@ -16,6 +16,9 @@
 package com._1c.qa.selenium.fxdriver;
 
 import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.CustomMenuItem;
@@ -43,11 +46,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com._1c.qa.selenium.fxdriver.KeysCouple.convertToSeleniumKeys;
 
 public class FxElement implements WebElement, Locatable
 {
+	private static final ObjectMapper mapper = new ObjectMapper();
     protected Node node;
     protected IFxRobot robot;
     protected FxSearchContext context;
@@ -137,8 +142,19 @@ public class FxElement implements WebElement, Locatable
     public String getAttribute(String name)
     {
         Map<String, Supplier<Object>> properties = NodeUtils.listProperties(node);
-
-        return properties.getOrDefault(name, String::new).get().toString();
+        if (name.equals("__attributes")) {
+        	try {
+	        	Map<String, String> tempMap = properties.entrySet().stream()
+	        		.filter(e -> e.getValue() != null && e.getValue().get() != null)
+	        		.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().get().toString()));
+				return mapper.writeValueAsString(tempMap);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+            Object o = properties.getOrDefault(name, String::new).get();
+            return o == null ? "null" : o.toString();
+		}
     }
 
     @Override
