@@ -18,7 +18,6 @@ package com._1c.qa.selenium.fxdriver;
 import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -26,15 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.interactions.internal.Locatable;
@@ -47,57 +38,48 @@ import java.util.stream.Collectors;
 
 import static com._1c.qa.selenium.fxdriver.KeysCouple.convertToSeleniumKeys;
 
-public class FxElement implements WebElement, Locatable
-{
-	private static final ObjectMapper mapper = new ObjectMapper();
+public class FxElement implements WebElement, Locatable {
+    private static final ObjectMapper mapper = new ObjectMapper();
     protected Node node;
     protected IFxRobot robot;
     protected FxSearchContext context;
 
-    public FxElement(Node node, IFxRobot robot)
-    {
+    public FxElement(Node node, IFxRobot robot) {
         this.node = node;
         this.robot = robot;
         this.context = node instanceof WebView
-            ? new FxWebViewSearchContext(robot, node)
-            : new FxSearchContext(robot, node);
+                ? new FxWebViewSearchContext(robot, node)
+                : new FxSearchContext(robot, node);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return node.toString();
     }
 
     @Override
-    public void click()
-    {
+    public void click() {
         NodeUtils.scrollIntoView(node);
 
         this.robot.click(node, PointerInput.MouseButton.LEFT);
     }
 
     @Override
-    public void submit()
-    {
+    public void submit() {
         throw new UnsupportedOperationException("JavaFX application does not support web forms");
     }
 
     @Override
-    public void sendKeys(CharSequence... keysToSend)
-    {
-        if (node instanceof TextInputControl)
-        {
+    public void sendKeys(CharSequence... keysToSend) {
+        if (node instanceof TextInputControl) {
             NodeUtils.scrollIntoView(node);
             robot.click(node);
 
-            for (CharSequence sequence : keysToSend)
-            {
+            for (CharSequence sequence : keysToSend) {
                 StringBuilder letters = new StringBuilder();
                 StringBuilder keys = new StringBuilder();
 
-                for (int i = 0; i < sequence.length(); i++)
-                {
+                for (int i = 0; i < sequence.length(); i++) {
                     Character c = sequence.charAt(i);
 
                     if (Character.isLetterOrDigit(c) ||
@@ -117,11 +99,9 @@ public class FxElement implements WebElement, Locatable
     }
 
     @Override
-    public void clear()
-    {
-        if (node instanceof TextInputControl)
-        {
-            String text = ((TextInputControl)node).getText();
+    public void clear() {
+        if (node instanceof TextInputControl) {
+            String text = ((TextInputControl) node).getText();
             int length = text == null ? 0 : text.length();
 
             if (length > 0)
@@ -130,33 +110,30 @@ public class FxElement implements WebElement, Locatable
     }
 
     @Override
-    public String getTagName()
-    {
+    public String getTagName() {
         return node.getTypeSelector();
     }
 
     @Override
-    public String getAttribute(String name)
-    {
+    public String getAttribute(String name) {
         Map<String, Supplier<Object>> properties = NodeUtils.listProperties(node);
         if (name.equals("__attributes")) {
-        	try {
-	        	Map<String, String> tempMap = properties.entrySet().stream()
-	        		.filter(e -> e.getValue() != null && e.getValue().get() != null)
-	        		.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().get().toString()));
-				return mapper.writeValueAsString(tempMap);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
+            try {
+                Map<String, String> tempMap = properties.entrySet().stream()
+                        .filter(e -> e.getValue() != null && e.getValue().get() != null)
+                        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().get().toString()));
+                return mapper.writeValueAsString(tempMap);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
             Object o = properties.getOrDefault(name, String::new).get();
             return o == null ? "null" : o.toString();
-		}
+        }
     }
 
     @Override
-    public boolean isSelected()
-    {
+    public boolean isSelected() {
         if (node instanceof Toggle)
             return ((Toggle) node).isSelected();
         else
@@ -164,19 +141,16 @@ public class FxElement implements WebElement, Locatable
     }
 
     @Override
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return !node.isDisabled();
     }
 
     @Override
-    public String getText()
-    {
+    public String getText() {
         return getText(node);
     }
 
-    private String getText(VBox vbox)
-    {
+    private String getText(VBox vbox) {
         StringBuilder sb = new StringBuilder();
 
         vbox.getChildren().stream()
@@ -186,8 +160,7 @@ public class FxElement implements WebElement, Locatable
         return sb.toString();
     }
 
-    private String getText(TextFlow textFlow)
-    {
+    private String getText(TextFlow textFlow) {
         StringBuilder sb = new StringBuilder();
         textFlow.getChildren().stream()
                 .map(this::getText)
@@ -196,150 +169,129 @@ public class FxElement implements WebElement, Locatable
         return sb.toString();
     }
 
-    private String getText(Text text)
-    {
+    private String getText(Text text) {
         return text.getText();
     }
 
-    private String getText(TextInputControl text)
-    {
+    private String getText(TextInputControl text) {
         return text.getText();
     }
 
-    private String getText(Labeled text)
-    {
+    private String getText(Labeled text) {
         return text.getText();
     }
 
-    private String getText(Node node)
-    {
-        if (node.getClass().getName().contains("MenuItemContainer"))
-        {
-            try
-            {
+    private String getText(Node node) {
+        if (node.getClass().getName().contains("MenuItemContainer")) {
+            try {
                 Object item = node.getClass().getMethod("getItem").invoke(node);
 
                 if (item instanceof CustomMenuItem)
-                    return getText(((CustomMenuItem)item).getContent());
+                    return getText(((CustomMenuItem) item).getContent());
 
                 if (item instanceof MenuItem)
-                    return ((MenuItem)item).getText();
-            }
-            catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException e)
-            {
+                    return ((MenuItem) item).getText();
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 throw new WebDriverException(e);
             }
         }
 
         if (node instanceof VBox)
-            return getText((VBox)node);
+            return getText((VBox) node);
 
         if (node instanceof TextFlow)
-            return getText((TextFlow)node);
+            return getText((TextFlow) node);
 
         if (node instanceof Text)
-            return getText((Text)node);
+            return getText((Text) node);
 
         if (node instanceof TextInputControl)
-            return getText((TextInputControl)node);
+            return getText((TextInputControl) node);
 
         if (node instanceof Labeled)
-            return getText((Labeled)node);
+            return getText((Labeled) node);
 
         return "";
     }
 
     @Override
-    public List<WebElement> findElements(By by)
-    {
+    public List<WebElement> findElements(By by) {
         return by.findElements(context);
     }
 
     @Override
-    public WebElement findElement(By by)
-    {
+    public WebElement findElement(By by) {
         return by.findElement(context);
     }
 
     @Override
-    public boolean isDisplayed()
-    {
+    public boolean isDisplayed() {
         return node.isVisible();
     }
 
     @Override
-    public Point getLocation()
-    {
+    public Point getLocation() {
         Bounds bounds = node.getBoundsInLocal();
         Bounds screenBounds = node.localToScreen(bounds);
 
-        return new Point((int)screenBounds.getMinX(),(int)screenBounds.getMinY());
+        return new Point((int) screenBounds.getMinX(), (int) screenBounds.getMinY());
     }
 
     @Override
-    public Dimension getSize()
-    {
-        int width = (int)node.getBoundsInLocal().getWidth();
-        int height = (int)node.getBoundsInLocal().getHeight();
+    public Dimension getSize() {
+        int width = (int) node.getBoundsInLocal().getWidth();
+        int height = (int) node.getBoundsInLocal().getHeight();
 
         return new Dimension(width, height);
     }
 
     @Override
-    public Rectangle getRect()
-    {
+    public Rectangle getRect() {
         Bounds bounds = node.getBoundsInLocal();
         Bounds screenBounds = node.localToScreen(bounds);
 
-        return new Rectangle((int)screenBounds.getMinX(),
-                (int)screenBounds.getMinY(),
-                (int)screenBounds.getWidth(),
-                (int)screenBounds.getHeight());
+        return new Rectangle((int) screenBounds.getMinX(),
+                (int) screenBounds.getMinY(),
+                (int) screenBounds.getWidth(),
+                (int) screenBounds.getHeight());
     }
 
     @Override
-    public String getCssValue(String propertyName)
-    {
+    public String getCssValue(String propertyName) {
         return null;
     }
 
     @Override
-    public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException
-    {
+    public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
         return null;
     }
 
     @Override
-    public Coordinates getCoordinates()
-    {
+    public Coordinates getCoordinates() {
         return new Coordinates() {
 
-            public Point onScreen()
-            {
+            public Point onScreen() {
                 Bounds bounds = node.getBoundsInLocal();
                 Bounds screenBounds = node.localToScreen(bounds);
 
-                return new Point((int)(screenBounds.getMinX() + screenBounds.getWidth() / 2), (int)(screenBounds.getMinY() + screenBounds.getHeight() / 2));
+                return new Point((int) (screenBounds.getMinX() + screenBounds.getWidth() / 2), (int) (screenBounds.getMinY() + screenBounds.getHeight() / 2));
             }
 
-            public Point inViewPort()
-            {
+            public Point inViewPort() {
                 Bounds bounds = node.getBoundsInLocal();
                 Bounds sceneBounds = node.localToScene(bounds);
 
-                return new Point((int)sceneBounds.getMinX(),(int)sceneBounds.getMinY());
+                return new Point((int) sceneBounds.getMinX(), (int) sceneBounds.getMinY());
             }
 
-            public Point onPage()
-            {
+            public Point onPage() {
                 Bounds bounds = node.getBoundsInLocal();
                 Bounds sceneBounds = node.localToScene(bounds);
 
-                return new Point((int)sceneBounds.getMinX(),(int)sceneBounds.getMinY());
+                return new Point((int) sceneBounds.getMinX(), (int) sceneBounds.getMinY());
             }
 
-            public Object getAuxiliary()
-            {
+            public Object getAuxiliary() {
                 return node;
             }
         };

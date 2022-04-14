@@ -20,33 +20,27 @@ import org.openqa.selenium.interactions.Keyboard;
 
 import static com._1c.qa.selenium.fxdriver.KeysCouple.convertToSeleniumKeys;
 
-public class FxKeyboard implements Keyboard
-{
-    private IKeyboardFxRobot<?> robot;
+public class FxKeyboard implements Keyboard {
+    private final IKeyboardFxRobot<?> robot;
 
-    public FxKeyboard(IKeyboardFxRobot<?> robot)
-    {
+    public FxKeyboard(IKeyboardFxRobot<?> robot) {
         this.robot = robot;
     }
 
     @Override
-    public void sendKeys(CharSequence... keysToSend)
-    {
-        for (CharSequence sequence : keysToSend)
-        {
+    public void sendKeys(CharSequence... keysToSend) {
+        for (CharSequence sequence : keysToSend) {
             robot.push(convertToSeleniumKeys(sequence));
         }
     }
 
     @Override
-    public void pressKey(CharSequence keyToPress)
-    {
+    public void pressKey(CharSequence keyToPress) {
         robot.keyDown(convertToSeleniumKeys(keyToPress));
     }
 
     @Override
-    public void releaseKey(CharSequence keyToRelease)
-    {
+    public void releaseKey(CharSequence keyToRelease) {
         robot.keyUp(convertToSeleniumKeys(keyToRelease));
     }
 }

@@ -18,7 +18,6 @@ package com._1c.qa.selenium.fxdriver;
 import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
 import javafx.scene.Node;
 import javafx.scene.web.WebView;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -32,47 +31,39 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FxSearchContext implements SearchContext, FindsById, FindsByClassName, FindsByCssSelector
-{
+public class FxSearchContext implements SearchContext, FindsById, FindsByClassName, FindsByCssSelector {
     protected IFxRobot robot;
     protected Node root;
 
-    public FxSearchContext(IFxRobot robot)
-    {
+    public FxSearchContext(IFxRobot robot) {
         this.robot = robot;
     }
 
-    public FxSearchContext(IFxRobot robot, Node root)
-    {
+    public FxSearchContext(IFxRobot robot, Node root) {
         this(robot);
         this.root = root;
     }
 
-    private List<Node> getRoots()
-    {
+    private List<Node> getRoots() {
         if (root != null)
             return Arrays.asList(root);
         else
-            return NodeUtils.listWindows().stream().map(w -> (Node)w.getScene().getRoot()).collect(Collectors.toList());
+            return NodeUtils.listWindows().stream().map(w -> (Node) w.getScene().getRoot()).collect(Collectors.toList());
     }
 
     @Override
-    public List<WebElement> findElements(By by)
-    {
+    public List<WebElement> findElements(By by) {
         return null;
     }
 
     @Override
-    public WebElement findElement(By by)
-    {
+    public WebElement findElement(By by) {
         return null;
     }
 
     @Override
-    public WebElement findElementById(String id)
-    {
-        for (Node root : getRoots())
-        {
+    public WebElement findElementById(String id) {
+        for (Node root : getRoots()) {
             Node node = NodeUtils.execute(() -> root.lookup("#" + id));
             if (node != null)
                 return createWebElement(node);
@@ -82,12 +73,10 @@ public class FxSearchContext implements SearchContext, FindsById, FindsByClassNa
     }
 
     @Override
-    public List<WebElement> findElementsById(String id)
-    {
+    public List<WebElement> findElementsById(String id) {
         List<WebElement> elements = new ArrayList<>();
 
-        for (Node root : getRoots())
-        {
+        for (Node root : getRoots()) {
             NodeUtils.execute(() -> root.lookupAll("#" + id).stream()
                     .map(this::createWebElement)
                     .forEach(elements::add));
@@ -98,10 +87,8 @@ public class FxSearchContext implements SearchContext, FindsById, FindsByClassNa
     }
 
     @Override
-    public WebElement findElementByClassName(String className)
-    {
-        for (Node root : getRoots())
-        {
+    public WebElement findElementByClassName(String className) {
+        for (Node root : getRoots()) {
             Node node = NodeUtils.execute(() -> root.lookup("." + className));
 
             if (node != null)
@@ -112,12 +99,10 @@ public class FxSearchContext implements SearchContext, FindsById, FindsByClassNa
     }
 
     @Override
-    public List<WebElement> findElementsByClassName(String className)
-    {
+    public List<WebElement> findElementsByClassName(String className) {
         List<WebElement> elements = new ArrayList<>();
 
-        for (Node root : getRoots())
-        {
+        for (Node root : getRoots()) {
             NodeUtils.execute(() -> root.lookupAll("." + className).stream()
                     .map(this::createWebElement)
                     .forEach(elements::add));
@@ -127,10 +112,8 @@ public class FxSearchContext implements SearchContext, FindsById, FindsByClassNa
     }
 
     @Override
-    public WebElement findElementByCssSelector(String cssSelector)
-    {
-        for (Node root : getRoots())
-        {
+    public WebElement findElementByCssSelector(String cssSelector) {
+        for (Node root : getRoots()) {
             Node node = NodeUtils.execute(() -> root.lookup(cssSelector));
 
             if (node != null)
@@ -141,12 +124,10 @@ public class FxSearchContext implements SearchContext, FindsById, FindsByClassNa
     }
 
     @Override
-    public List<WebElement> findElementsByCssSelector(String cssSelector)
-    {
+    public List<WebElement> findElementsByCssSelector(String cssSelector) {
         List<WebElement> elements = new ArrayList<>();
 
-        for (Node root : getRoots())
-        {
+        for (Node root : getRoots()) {
             NodeUtils.execute(() -> root.lookupAll(cssSelector).stream()
                     .map(this::createWebElement)
                     .forEach(elements::add));
@@ -155,8 +136,7 @@ public class FxSearchContext implements SearchContext, FindsById, FindsByClassNa
         return elements;
     }
 
-    private WebElement createWebElement(Node node)
-    {
+    private WebElement createWebElement(Node node) {
         if (node instanceof WebView)
             return new FxWebViewElement(node, robot);
         else

@@ -25,8 +25,7 @@ import java.util.List;
 /**
  * Map Selenium keys to the JavaFx keys
  */
-public enum KeysCouple
-{
+public enum KeysCouple {
     ESC(Keys.ESCAPE, KeyCode.ESCAPE),
     INSERT(Keys.INSERT, KeyCode.INSERT),
     HOME(Keys.HOME, KeyCode.HOME),
@@ -71,27 +70,15 @@ public enum KeysCouple
     SPACE(Keys.SPACE, KeyCode.SPACE),
     BACK_SPACE(Keys.BACK_SPACE, KeyCode.BACK_SPACE);
 
-    private Keys seleniumKey;
-    private KeyCode javafxKey;
+    private final Keys seleniumKey;
+    private final KeyCode javafxKey;
 
-    KeysCouple(Keys seleniumKey, KeyCode javafxKey)
-    {
+    KeysCouple(Keys seleniumKey, KeyCode javafxKey) {
         this.seleniumKey = seleniumKey;
         this.javafxKey = javafxKey;
     }
 
-    public Keys getSeleniumKey()
-    {
-        return seleniumKey;
-    }
-
-    public KeyCode getJavafxKey()
-    {
-        return javafxKey;
-    }
-
-    public static KeysCouple fromSeleniumKey(Keys seleniumKey)
-    {
+    public static KeysCouple fromSeleniumKey(Keys seleniumKey) {
         for (KeysCouple key : values())
             if (key.getSeleniumKey() == seleniumKey)
                 return key;
@@ -99,12 +86,10 @@ public enum KeysCouple
         throw new WebDriverException("Unable to find key record for: " + seleniumKey);
     }
 
-    public static Keys[] convertToSeleniumKeys(CharSequence sequence)
-    {
+    public static Keys[] convertToSeleniumKeys(CharSequence sequence) {
         List<Keys> keys = new ArrayList<>(sequence.length());
 
-        for (int i = 0; i < sequence.length(); i++)
-        {
+        for (int i = 0; i < sequence.length(); i++) {
             Keys key = Keys.getKeyFromUnicode(sequence.charAt(i));
 
             if (key == Keys.NULL)
@@ -116,12 +101,10 @@ public enum KeysCouple
         return keys.toArray(new Keys[0]);
     }
 
-    public static KeyCode[] convertToJavaFxKeys(CharSequence sequence)
-    {
+    public static KeyCode[] convertToJavaFxKeys(CharSequence sequence) {
         List<KeyCode> keys = new ArrayList<>(sequence.length());
 
-        for (int i = 0; i < sequence.length(); i++)
-        {
+        for (int i = 0; i < sequence.length(); i++) {
             Keys key = Keys.getKeyFromUnicode(sequence.charAt(i));
 
             if (key == Keys.NULL)
@@ -133,8 +116,15 @@ public enum KeysCouple
         return keys.toArray(new KeyCode[0]);
     }
 
-    public static KeyCode convertKey(Keys key)
-    {
+    public static KeyCode convertKey(Keys key) {
         return fromSeleniumKey(key).getJavafxKey();
+    }
+
+    public Keys getSeleniumKey() {
+        return seleniumKey;
+    }
+
+    public KeyCode getJavafxKey() {
+        return javafxKey;
     }
 }

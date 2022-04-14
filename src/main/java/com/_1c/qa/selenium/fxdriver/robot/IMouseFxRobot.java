@@ -19,8 +19,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import org.openqa.selenium.interactions.PointerInput.MouseButton;
 
-public interface IMouseFxRobot<T extends IMouseFxRobot<?>>
-{
+public interface IMouseFxRobot<T extends IMouseFxRobot<?>> {
     /**
      * Move cursor to the provided location.
      *
@@ -34,16 +33,14 @@ public interface IMouseFxRobot<T extends IMouseFxRobot<?>>
      * @param x horizontal screen coordinate
      * @param y vertical screen coordinate
      */
-    default T move(int x, int y)
-    {
+    default T move(int x, int y) {
         return move(new Point2D(x, y));
     }
 
     /**
      * Left mouse click on the current position.
      */
-    default T click()
-    {
+    default T click() {
         return click(MouseButton.LEFT);
     }
 
@@ -60,16 +57,15 @@ public interface IMouseFxRobot<T extends IMouseFxRobot<?>>
      * @param x horizontal screen position
      * @param y vertical screen position
      */
-    default T click(int x, int y)
-    {
+    default T click(int x, int y) {
         return click(x, y, MouseButton.LEFT);
     }
 
     /**
      * Mouse click on the provided screen position.
      *
-     * @param x horizontal screen position
-     * @param y vertical screen position
+     * @param x      horizontal screen position
+     * @param y      vertical screen position
      * @param button mouse button
      */
     T click(int x, int y, MouseButton button);
@@ -80,16 +76,15 @@ public interface IMouseFxRobot<T extends IMouseFxRobot<?>>
      * @param x horizontal screen position
      * @param y vertical screen position
      */
-    default T doubleClick(int x, int y)
-    {
+    default T doubleClick(int x, int y) {
         return doubleClick(x, y, MouseButton.LEFT);
     }
 
     /**
      * Double mouse button click on the provided screen position.
      *
-     * @param x horizontal screen position
-     * @param y vertical screen position
+     * @param x      horizontal screen position
+     * @param y      vertical screen position
      * @param button mouse button
      */
     T doubleClick(int x, int y, MouseButton button);
@@ -106,27 +101,28 @@ public interface IMouseFxRobot<T extends IMouseFxRobot<?>>
      *
      * @param node JavaFx node
      */
-    default T click(Node node)
-    {
+    default T click(Node node) {
         return click(node, MouseButton.LEFT);
     }
 
     /**
      * Mouse click on the middle of the node.
      *
-     * @param node JavaFx node
+     * @param node   JavaFx node
      * @param button mouse button
      */
     T click(Node node, MouseButton button);
 
     /**
      * Press mouse button.
+     *
      * @param button mouse button
      */
     FxRobot mouseDown(MouseButton button);
 
     /**
      * Release button.
+     *
      * @param button mouse button
      */
     FxRobot mouseUp(MouseButton button);

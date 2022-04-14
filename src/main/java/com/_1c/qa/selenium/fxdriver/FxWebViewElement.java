@@ -16,9 +16,11 @@
 
 package com._1c.qa.selenium.fxdriver;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
+import javafx.scene.Node;
+import javafx.scene.web.WebView;
+import org.w3c.dom.Attr;
+import org.w3c.dom.NodeList;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -28,34 +30,25 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Attr;
-import org.w3c.dom.NodeList;
-
-import javafx.scene.Node;
-import javafx.scene.web.WebView;
-
-import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import static javax.xml.xpath.XPathConstants.NODESET;
 
-public class FxWebViewElement extends FxElement
-{
-    private WebView webView;
+public class FxWebViewElement extends FxElement {
+    private final WebView webView;
 
-    FxWebViewElement(Node node, IFxRobot robot)
-    {
+    FxWebViewElement(Node node, IFxRobot robot) {
         super(node, robot);
-        webView = (WebView)node;
+        webView = (WebView) node;
         setDocumentIds(webView);
     }
 
     @Override
-    public String getText()
-    {
+    public String getText() {
         return NodeUtils.execute(() -> {
-            try
-            {
+            try {
                 TransformerFactory tFactory = TransformerFactory.newInstance();
                 Transformer transformer = tFactory.newTransformer();
 
@@ -63,36 +56,28 @@ public class FxWebViewElement extends FxElement
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 StreamResult result = new StreamResult(out);
                 transformer.transform(source, result);
-                return new String(out.toByteArray(), StandardCharsets.UTF_8);
-            }
-            catch (TransformerException e)
-            {
+                return out.toString(StandardCharsets.UTF_8);
+            } catch (TransformerException e) {
                 throw new IllegalStateException(e);
             }
         });
     }
 
-    private void setDocumentIds(WebView webView)
-    {
+    private void setDocumentIds(WebView webView) {
         NodeUtils.execute(() -> {
-            try
-            {
+            try {
                 XPath xPath = XPathFactory.newInstance().newXPath();
-                NodeList nodes = (NodeList)xPath.compile("//*").evaluate(webView.getEngine().getDocument(), NODESET);
-                for (int i = 0; i < nodes.getLength(); i++)
-                {
+                NodeList nodes = (NodeList) xPath.compile("//*").evaluate(webView.getEngine().getDocument(), NODESET);
+                for (int i = 0; i < nodes.getLength(); i++) {
                     org.w3c.dom.Node node = nodes.item(i);
                     org.w3c.dom.Node idNode = node.getAttributes().getNamedItem("id");
-                    if (idNode == null)
-                    {
+                    if (idNode == null) {
                         Attr attr = webView.getEngine().getDocument().createAttribute("id");
                         attr.setValue(UUID.randomUUID().toString());
                         node.getAttributes().setNamedItem(attr);
                     }
                 }
-            }
-            catch (XPathExpressionException e)
-            {
+            } catch (XPathExpressionException e) {
                 throw new IllegalStateException(e);
             }
         });

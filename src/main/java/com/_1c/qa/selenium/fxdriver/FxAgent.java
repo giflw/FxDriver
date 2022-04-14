@@ -35,26 +35,21 @@ import java.util.function.Function;
  *  This method will be executed before agent starts selenium server.
  * </pre>
  */
-public class FxAgent
-{
+public class FxAgent {
     @SuppressWarnings("unchecked")
-    public static void premain(String args) throws Exception
-    {
+    public static void premain(String args) throws Exception {
         Properties properties = parseArguments(args);
 
         int port = Integer.valueOf(properties.getProperty("port", "4444"));
 
         Thread agentThread = new Thread(() -> {
-            try
-            {
-                if (properties.containsKey("extension"))
-                {
+            try {
+                if (properties.containsKey("extension")) {
                     File extensionJar = new File(properties.getProperty("extension"));
-                    URLClassLoader extLoader = new URLClassLoader(new URL[] { extensionJar.toURI().toURL() });
+                    URLClassLoader extLoader = new URLClassLoader(new URL[]{extensionJar.toURI().toURL()});
 
                     ServiceLoader<Function> serviceLoader = ServiceLoader.load(Function.class, extLoader);
-                    if (serviceLoader.iterator().hasNext())
-                    {
+                    if (serviceLoader.iterator().hasNext()) {
                         Function<Properties, Boolean> extension = (Function<Properties, Boolean>)
                                 serviceLoader.iterator().next();
 
@@ -68,14 +63,12 @@ public class FxAgent
                         .toURI().toURL();
 
                 ClassLoader bootstrapLoader = ClassLoader.getSystemClassLoader().getParent();
-                ClassLoader classLoader = new URLClassLoader(new URL[] {self}, bootstrapLoader);
+                ClassLoader classLoader = new URLClassLoader(new URL[]{self}, bootstrapLoader);
 
                 Class<?> fxAgent = classLoader.loadClass("com._1c.qa.selenium.fxdriver.FxServer");
 
                 fxAgent.getMethod("start", int.class).invoke(null, port);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 // Print exception to the error stream, because it is dangerous to use logging libraries here
                 e.printStackTrace();
             }
@@ -84,15 +77,13 @@ public class FxAgent
         agentThread.start();
     }
 
-    private static Properties parseArguments(String args)
-    {
+    private static Properties parseArguments(String args) {
         Properties properties = new Properties();
 
         if (args == null || args.equals(""))
             return properties;
 
-        for (String param : args.split(","))
-        {
+        for (String param : args.split(",")) {
             String[] arg = param.split("=");
             properties.setProperty(arg[0], arg[1]);
         }

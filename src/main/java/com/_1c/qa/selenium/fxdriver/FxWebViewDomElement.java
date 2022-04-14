@@ -16,33 +16,23 @@
 
 package com._1c.qa.selenium.fxdriver;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.internal.Coordinates;
-import org.w3c.dom.html.HTMLElement;
-
+import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
 import javafx.geometry.Bounds;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.internal.Coordinates;
+import org.w3c.dom.html.HTMLElement;
 
-import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
+import java.util.List;
+import java.util.concurrent.Callable;
 
-public class FxWebViewDomElement extends FxElement
-{
+public class FxWebViewDomElement extends FxElement {
     private final WebView webView;
     private final HTMLElement element;
     private final Coordinates coordinates;
 
-    FxWebViewDomElement(WebView webView, HTMLElement element, IFxRobot robot)
-    {
+    FxWebViewDomElement(WebView webView, HTMLElement element, IFxRobot robot) {
         super(webView, robot);
         this.webView = webView;
         this.element = element;
@@ -50,178 +40,151 @@ public class FxWebViewDomElement extends FxElement
     }
 
     @Override
-    public void click()
-    {
+    public void click() {
         String js = String.format("document.getElementById('%s').click();", element.getId());
         NodeUtils.execute(() -> webView.getEngine().executeScript(js));
     }
 
     @Override
-    public void submit()
-    {
+    public void submit() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void sendKeys(CharSequence... keysToSend)
-    {
+    public void sendKeys(CharSequence... keysToSend) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void clear()
-    {
+    public void clear() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getTagName()
-    {
+    public String getTagName() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getAttribute(String name)
-    {
+    public String getAttribute(String name) {
         return null;
     }
 
     @Override
-    public boolean isSelected()
-    {
+    public boolean isSelected() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getText()
-    {
+    public String getText() {
         return element.getTextContent();
     }
 
     @Override
-    public List<WebElement> findElements(By by)
-    {
+    public List<WebElement> findElements(By by) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public WebElement findElement(By by)
-    {
+    public WebElement findElement(By by) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isDisplayed()
-    {
+    public boolean isDisplayed() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Coordinates getCoordinates()
-    {
+    public Coordinates getCoordinates() {
         return coordinates;
     }
 
     @Override
-    public Point getLocation()
-    {
+    public Point getLocation() {
         Rectangle rectangle = getRect();
         return rectangle.getPoint();
     }
 
     @Override
-    public Dimension getSize()
-    {
+    public Dimension getSize() {
         return getRect().getDimension();
     }
 
     @Override
-    public Rectangle getRect()
-    {
+    public Rectangle getRect() {
         return getBoundingClientRect();
     }
 
 
     @Override
-    public String getCssValue(String propertyName)
-    {
+    public String getCssValue(String propertyName) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException
-    {
+    public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
         return null;
     }
 
-    private Rectangle getBoundingClientRect()
-    {
-        return NodeUtils.execute(new Callable<Rectangle>()
-        {
+    private Rectangle getBoundingClientRect() {
+        return NodeUtils.execute(new Callable<Rectangle>() {
             @Override
-            public Rectangle call() throws Exception
-            {
+            public Rectangle call() throws Exception {
                 String rectJs = new StringBuilder()
                         .append(String.format("var element = document.getElementById('%s');", element.getId()))
                         .append('\n').append("element.getBoundingClientRect();")
                         .toString();
 
-                JSObject pointJs = (JSObject)webView.getEngine().executeScript(rectJs);
+                JSObject pointJs = (JSObject) webView.getEngine().executeScript(rectJs);
 
                 double top = Double.valueOf(pointJs.getMember("top").toString());
                 double left = Double.valueOf(pointJs.getMember("left").toString());
                 double right = Double.valueOf(pointJs.getMember("right").toString());
                 double bottom = Double.valueOf(pointJs.getMember("bottom").toString());
 
-                return new Rectangle((int)left, (int)top, (int)(bottom - top), (int)(right - left));
+                return new Rectangle((int) left, (int) top, (int) (bottom - top), (int) (right - left));
             }
         });
     }
 
-    private Coordinates createCoordinate()
-    {
-        return new Coordinates()
-        {
-            public Point onScreen()
-            {
+    private Coordinates createCoordinate() {
+        return new Coordinates() {
+            public Point onScreen() {
                 Rectangle rect = getBoundingClientRect();
 
                 Bounds bounds = node.getBoundsInLocal();
                 Bounds screenBounds = node.localToScreen(bounds);
 
                 // indent for webView + indent for web element relative to webView + middle of element
-                return new Point((int)(screenBounds.getMinX() + rect.getX() + rect.getWidth() / 2.0),
-                        (int)(screenBounds.getMinY() + rect.getY() + rect.getHeight() / 2.0));
+                return new Point((int) (screenBounds.getMinX() + rect.getX() + rect.getWidth() / 2.0),
+                        (int) (screenBounds.getMinY() + rect.getY() + rect.getHeight() / 2.0));
             }
 
-            public Point inViewPort()
-            {
+            public Point inViewPort() {
                 Bounds bounds = node.getBoundsInLocal();
                 Bounds sceneBounds = node.localToScene(bounds);
 
                 Rectangle rect = getBoundingClientRect();
 
-                return new Point((int)sceneBounds.getMinX() + rect.getX(), (int)sceneBounds.getMinY() + rect.getY());
+                return new Point((int) sceneBounds.getMinX() + rect.getX(), (int) sceneBounds.getMinY() + rect.getY());
             }
 
-            public Point onPage()
-            {
+            public Point onPage() {
                 Bounds bounds = node.getBoundsInLocal();
                 Bounds sceneBounds = node.localToScene(bounds);
 
                 Rectangle rect = getBoundingClientRect();
 
-                return new Point((int)sceneBounds.getMinX() + rect.getX(), (int)sceneBounds.getMinY() + rect.getY());
+                return new Point((int) sceneBounds.getMinX() + rect.getX(), (int) sceneBounds.getMinY() + rect.getY());
             }
 
-            public Object getAuxiliary()
-            {
+            public Object getAuxiliary() {
                 return node;
             }
         };

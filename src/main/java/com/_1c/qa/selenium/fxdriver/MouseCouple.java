@@ -24,40 +24,22 @@ import java.awt.event.InputEvent;
 /**
  * Map selenium buttons to the javafx button and the awt buttons.
  */
-public enum MouseCouple
-{
+public enum MouseCouple {
     LEFT(PointerInput.MouseButton.LEFT, MouseButton.PRIMARY, InputEvent.BUTTON1_MASK),
     RIGHT(PointerInput.MouseButton.RIGHT, MouseButton.SECONDARY, InputEvent.BUTTON3_MASK),
     MIDDLE(PointerInput.MouseButton.MIDDLE, MouseButton.MIDDLE, InputEvent.BUTTON2_MASK);
 
-    private PointerInput.MouseButton seleniumButton;
-    private MouseButton javafxButton;
-    private int awtButton;
+    private final PointerInput.MouseButton seleniumButton;
+    private final MouseButton javafxButton;
+    private final int awtButton;
 
-    MouseCouple(PointerInput.MouseButton seleniumButton, MouseButton javafxButton, int awtButton)
-    {
+    MouseCouple(PointerInput.MouseButton seleniumButton, MouseButton javafxButton, int awtButton) {
         this.seleniumButton = seleniumButton;
         this.javafxButton = javafxButton;
         this.awtButton = awtButton;
     }
 
-    public PointerInput.MouseButton getSeleniumButton()
-    {
-        return this.seleniumButton;
-    }
-
-    public MouseButton getJavafxButton()
-    {
-        return javafxButton;
-    }
-
-    public int getAwtButton()
-    {
-        return awtButton;
-    }
-
-    public static MouseCouple fromSeleniumButton(PointerInput.MouseButton seleniumButton)
-    {
+    public static MouseCouple fromSeleniumButton(PointerInput.MouseButton seleniumButton) {
         for (MouseCouple button : values())
             if (button.getSeleniumButton() == seleniumButton)
                 return button;
@@ -65,13 +47,23 @@ public enum MouseCouple
         throw new WebDriverException("Unable to find button record for: " + seleniumButton);
     }
 
-    public static MouseButton convertToFxButton(PointerInput.MouseButton seleniumButton)
-    {
+    public static MouseButton convertToFxButton(PointerInput.MouseButton seleniumButton) {
         return fromSeleniumButton(seleniumButton).getJavafxButton();
     }
 
-    public static int convertToAwtButton(PointerInput.MouseButton seleniumButton)
-    {
+    public static int convertToAwtButton(PointerInput.MouseButton seleniumButton) {
         return fromSeleniumButton(seleniumButton).getAwtButton();
+    }
+
+    public PointerInput.MouseButton getSeleniumButton() {
+        return this.seleniumButton;
+    }
+
+    public MouseButton getJavafxButton() {
+        return javafxButton;
+    }
+
+    public int getAwtButton() {
+        return awtButton;
     }
 }

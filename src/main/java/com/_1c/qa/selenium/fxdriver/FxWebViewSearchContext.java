@@ -16,12 +16,9 @@
 
 package com._1c.qa.selenium.fxdriver;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
-
+import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
+import javafx.scene.Node;
+import javafx.scene.web.WebView;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -29,23 +26,20 @@ import org.openqa.selenium.internal.FindsByXPath;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLElement;
 
-import javafx.scene.Node;
-import javafx.scene.web.WebView;
-
-import com._1c.qa.selenium.fxdriver.robot.IFxRobot;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.xml.xpath.XPathConstants.NODESET;
 
-public class FxWebViewSearchContext extends FxSearchContext implements SearchContext, FindsByXPath
-{
-    FxWebViewSearchContext(IFxRobot robot, Node root)
-    {
+public class FxWebViewSearchContext extends FxSearchContext implements SearchContext, FindsByXPath {
+    FxWebViewSearchContext(IFxRobot robot, Node root) {
         super(robot, root);
     }
 
     @Override
-    public WebElement findElementByXPath(String using)
-    {
+    public WebElement findElementByXPath(String using) {
         List<WebElement> elements = findElementsByXPath(using);
         if (elements.isEmpty())
             throw new NoSuchElementException("Not found element for xpath '" + using + "'");
@@ -53,16 +47,14 @@ public class FxWebViewSearchContext extends FxSearchContext implements SearchCon
     }
 
     @Override
-    public List<WebElement> findElementsByXPath(String xpath)
-    {
+    public List<WebElement> findElementsByXPath(String xpath) {
         return NodeUtils.execute(() -> {
             XPath xPath = XPathFactory.newInstance().newXPath();
-            WebView webView = (WebView)root;
-            NodeList nodes = (NodeList)xPath.compile(xpath).evaluate(webView.getEngine().getDocument(), NODESET);
+            WebView webView = (WebView) root;
+            NodeList nodes = (NodeList) xPath.compile(xpath).evaluate(webView.getEngine().getDocument(), NODESET);
             List<WebElement> result = new ArrayList<>();
-            for (int i = 0; i < nodes.getLength(); ++i)
-            {
-                result.add(new FxWebViewDomElement(webView, (HTMLElement)nodes.item(i), robot));
+            for (int i = 0; i < nodes.getLength(); ++i) {
+                result.add(new FxWebViewDomElement(webView, (HTMLElement) nodes.item(i), robot));
             }
             return result;
         });

@@ -15,7 +15,6 @@
  */
 package com._1c.qa.selenium.fxdriver;
 
-import org.awaitility.core.ConditionTimeoutException;
 import org.openqa.selenium.remote.server.SeleniumServer;
 
 import java.util.concurrent.TimeUnit;
@@ -27,40 +26,32 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 /**
  * Stops SeleniumServer after JavaFX app will exit
  */
-public class ShutdownHook extends Thread
-{
-    private SeleniumServer server;
+public class ShutdownHook extends Thread {
+    private final SeleniumServer server;
 
-    ShutdownHook(SeleniumServer server)
-    {
+    ShutdownHook(SeleniumServer server) {
         this.server = server;
 
         setDaemon(true);
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         Thread javaFxThread = await().forever()
                 .pollInterval(1, TimeUnit.SECONDS)
                 .until(() -> getThreadByName("JavaFX Application Thread"), is(notNullValue()));
 
-        try
-        {
+        try {
             javaFxThread.join();
 
             System.exit(0);
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
-    private Thread getThreadByName(String threadName)
-    {
-        for (Thread thread : Thread.getAllStackTraces().keySet())
-        {
+    private Thread getThreadByName(String threadName) {
+        for (Thread thread : Thread.getAllStackTraces().keySet()) {
             if (thread.getName().equals(threadName))
                 return thread;
         }

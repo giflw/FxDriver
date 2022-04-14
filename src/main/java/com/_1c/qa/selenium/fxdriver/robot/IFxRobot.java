@@ -18,16 +18,17 @@ package com._1c.qa.selenium.fxdriver.robot;
 /**
  * Represents various interaction with application under test.
  */
-public interface IFxRobot extends IMouseFxRobot<IFxRobot>, IKeyboardFxRobot<IFxRobot>
-{
+public interface IFxRobot extends IMouseFxRobot<IFxRobot>, IKeyboardFxRobot<IFxRobot> {
     /**
      * Delay execution.
+     *
      * @param timeout timeout in millis
      */
     IFxRobot delay(long timeout);
 
     /**
      * Erase text using backspace key.
+     *
      * @param length text length
      */
     IFxRobot eraseText(int length);

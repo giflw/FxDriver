@@ -17,28 +17,27 @@ package com._1c.qa.selenium.fxdriver.robot;
 
 import org.openqa.selenium.Keys;
 
-public interface IKeyboardFxRobot<T extends IKeyboardFxRobot<?>>
-{
+public interface IKeyboardFxRobot<T extends IKeyboardFxRobot<?>> {
     /**
      * Release keyboard keys.
      *
      * @param keys selenium keys
      */
-    FxRobot keyUp(Keys...keys);
+    FxRobot keyUp(Keys... keys);
 
     /**
      * Press keyboard keys.
      *
      * @param keys selenium keys
      */
-    FxRobot keyDown(Keys...keys);
+    FxRobot keyDown(Keys... keys);
 
     /**
      * Push several keys.
      *
      * @param keys selenium keys list.
      */
-    FxRobot push(Keys ...keys);
+    FxRobot push(Keys... keys);
 
     /**
      * Type text into current focused element.

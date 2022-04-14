@@ -31,12 +31,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.PointerInput;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Robot;
-import java.awt.AWTException;
-import java.awt.Toolkit;
-import java.awt.MouseInfo;
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,22 +40,17 @@ import java.util.List;
 /**
  * Implements various interaction with application under test.
  */
-public class FxRobot implements IFxRobot
-{
+public class FxRobot implements IFxRobot {
     private static final long SLEEP_AS_HUMAN = 32;
 
-    private KeyState keyState = new KeyState();
-    private AwtRobot awtRobot = new AwtRobot();
+    private final KeyState keyState = new KeyState();
+    private final AwtRobot awtRobot = new AwtRobot();
 
     @Override
-    public FxRobot delay(long timeout)
-    {
-        try
-        {
+    public FxRobot delay(long timeout) {
+        try {
             Thread.sleep(timeout);
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
@@ -68,34 +58,29 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot click(int x, int y, PointerInput.MouseButton button)
-    {
+    public FxRobot click(int x, int y, PointerInput.MouseButton button) {
         Point2D point = new Point2D(x, y);
 
         return move(point).click(button);
     }
 
     @Override
-    public FxRobot doubleClick(int x, int y, PointerInput.MouseButton button)
-    {
+    public FxRobot doubleClick(int x, int y, PointerInput.MouseButton button) {
         Point2D point = new Point2D(x, y);
 
         return move(point).doubleClick(button);
     }
 
     @Override
-    public FxRobot click(Node node, PointerInput.MouseButton button)
-    {
+    public FxRobot click(Node node, PointerInput.MouseButton button) {
         Point2D point = NodeUtils.getNodePoint(node);
 
         return move(point).move(node).click(button);
     }
 
     @Override
-    public FxRobot eraseText(int length)
-    {
-        for (int i = 0; i < length; i++)
-        {
+    public FxRobot eraseText(int length) {
+        for (int i = 0; i < length; i++) {
             push(Keys.BACK_SPACE);
             delay(SLEEP_AS_HUMAN);
         }
@@ -104,8 +89,7 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot move(Point2D location)
-    {
+    public FxRobot move(Point2D location) {
         Point2D source = fromAwtPoint(MouseInfo.getPointerInfo().getLocation());
         if (source.equals(location))
             return this;
@@ -113,17 +97,16 @@ public class FxRobot implements IFxRobot
         List<Point2D> path = calculatePath(source, location);
 
         path.forEach(p -> {
-            awtRobot.get().mouseMove((int)p.getX(), (int)p.getY());
+            awtRobot.get().mouseMove((int) p.getX(), (int) p.getY());
             delay(SLEEP_AS_HUMAN);
         });
 
-        awtRobot.get().mouseMove((int)location.getX(), (int)location.getY());
+        awtRobot.get().mouseMove((int) location.getX(), (int) location.getY());
         return this;
     }
 
     @Override
-    public FxRobot click(PointerInput.MouseButton button)
-    {
+    public FxRobot click(PointerInput.MouseButton button) {
         int awtButton = MouseCouple.convertToAwtButton(button);
 
         awtRobot.get().mousePress(awtButton);
@@ -133,8 +116,7 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot doubleClick(PointerInput.MouseButton button)
-    {
+    public FxRobot doubleClick(PointerInput.MouseButton button) {
         click(button);
         click(button);
 
@@ -142,8 +124,7 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot mouseDown(PointerInput.MouseButton button)
-    {
+    public FxRobot mouseDown(PointerInput.MouseButton button) {
         int awtButton = MouseCouple.convertToAwtButton(button);
 
         awtRobot.get().mousePress(awtButton);
@@ -152,8 +133,7 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot mouseUp(PointerInput.MouseButton button)
-    {
+    public FxRobot mouseUp(PointerInput.MouseButton button) {
         int awtButton = MouseCouple.convertToAwtButton(button);
 
         awtRobot.get().mouseRelease(awtButton);
@@ -162,11 +142,10 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot type(String text)
-    {
+    public FxRobot type(String text) {
         Scene scene = NodeUtils.getTargetWindow().getScene();
 
-        text.chars().mapToObj(i -> (char)i).forEach(c ->
+        text.chars().mapToObj(i -> (char) i).forEach(c ->
         {
             type(c, scene);
             delay(SLEEP_AS_HUMAN);
@@ -176,8 +155,7 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot push(Keys ...keys)
-    {
+    public FxRobot push(Keys... keys) {
         List<Keys> pressKeys = Arrays.asList(keys);
         List<Keys> releaseKeys = new ArrayList<>(pressKeys);
         Collections.reverse(releaseKeys);
@@ -189,13 +167,11 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot keyDown(Keys ...keys)
-    {
+    public FxRobot keyDown(Keys... keys) {
         Scene scene = NodeUtils.getTargetWindow().getScene();
 
         Platform.runLater(() -> {
-            for (Keys key : keys)
-            {
+            for (Keys key : keys) {
                 Event.fireEvent(getEventTarget(scene), createKeyEvent(KeyEvent.KEY_PRESSED,
                         KeysCouple.fromSeleniumKey(key).getJavafxKey(), ""));
             }
@@ -205,13 +181,11 @@ public class FxRobot implements IFxRobot
     }
 
     @Override
-    public FxRobot keyUp(Keys ...keys)
-    {
+    public FxRobot keyUp(Keys... keys) {
         Scene scene = NodeUtils.getTargetWindow().getScene();
 
         Platform.runLater(() -> {
-            for (Keys key : keys)
-            {
+            for (Keys key : keys) {
                 Event.fireEvent(getEventTarget(scene), createKeyEvent(KeyEvent.KEY_RELEASED,
                         KeysCouple.fromSeleniumKey(key).getJavafxKey(), ""));
             }
@@ -220,51 +194,44 @@ public class FxRobot implements IFxRobot
         return this;
     }
 
-    private FxRobot move(Node node)
-    {
+    private FxRobot move(Node node) {
         Point2D target = NodeUtils.getNodePoint(node);
 
-        awtRobot.get().mouseMove((int)target.getX(), (int)target.getY());
+        awtRobot.get().mouseMove((int) target.getX(), (int) target.getY());
 
         return this;
     }
 
-    private List<Point2D> calculatePath(Point2D source, Point2D target)
-    {
+    private List<Point2D> calculatePath(Point2D source, Point2D target) {
         List<Point2D> points = new ArrayList<>();
         int stepCount = pointDistance(source, target) / 50;
         if (stepCount > 8)
             stepCount = 8;
 
-        for (int i = 0; i <= stepCount; i++)
-        {
-            double factor = (double)i / (double)stepCount;
+        for (int i = 0; i <= stepCount; i++) {
+            double factor = (double) i / (double) stepCount;
             Point2D point = pointBetween(source, target, factor);
             points.add(point);
         }
         return Collections.unmodifiableList(points);
     }
 
-    private int pointDistance(Point2D source, Point2D target)
-    {
-        return (int)Math.sqrt(Math.pow(target.getX() - source.getX(), 2) + Math.pow(target.getY() - source.getY(), 2));
+    private int pointDistance(Point2D source, Point2D target) {
+        return (int) Math.sqrt(Math.pow(target.getX() - source.getX(), 2) + Math.pow(target.getY() - source.getY(), 2));
     }
 
-    private Point2D pointBetween(Point2D point0, Point2D point1, double factor)
-    {
+    private Point2D pointBetween(Point2D point0, Point2D point1, double factor) {
         double x = point0.getX() + ((point1.getX() - point0.getX()) * factor);
         double y = point0.getY() + ((point1.getY() - point0.getY()) * factor);
 
         return new Point2D(x, y);
     }
 
-    private Point2D fromAwtPoint(Point awtPoint)
-    {
+    private Point2D fromAwtPoint(Point awtPoint) {
         return new Point2D(awtPoint.getX(), awtPoint.getY());
     }
 
-    private void type(char symbol, Scene scene)
-    {
+    private void type(char symbol, Scene scene) {
         KeyCode key = charToKey(symbol);
 
         Platform.runLater(() -> {
@@ -274,8 +241,7 @@ public class FxRobot implements IFxRobot
         });
     }
 
-    private KeyEvent createKeyEvent(EventType<KeyEvent> eventType, KeyCode keyCode, String character)
-    {
+    private KeyEvent createKeyEvent(EventType<KeyEvent> eventType, KeyCode keyCode, String character) {
         keyState.changeState(eventType, keyCode);
 
         boolean typed = eventType == KeyEvent.KEY_TYPED;
@@ -285,15 +251,12 @@ public class FxRobot implements IFxRobot
                 keyState.isAlt(), keyState.isMeta());
     }
 
-    private EventTarget getEventTarget(Scene scene)
-    {
+    private EventTarget getEventTarget(Scene scene) {
         return scene.getFocusOwner() != null ? scene.getFocusOwner() : scene;
     }
 
-    private KeyCode charToKey(char character)
-    {
-        switch (character)
-        {
+    private KeyCode charToKey(char character) {
+        switch (character) {
             case '\n':
                 return KeyCode.ENTER;
             case '\t':
@@ -303,45 +266,37 @@ public class FxRobot implements IFxRobot
         }
     }
 
-    private class KeyState
-    {
+    private class KeyState {
         private boolean shift;
         private boolean alt;
         private boolean ctrl;
         private boolean meta;
 
-        KeyState()
-        {
+        KeyState() {
             this.shift = false;
             this.alt = false;
             this.ctrl = false;
             this.meta = false;
         }
 
-        boolean isShift()
-        {
+        boolean isShift() {
             return shift;
         }
 
-        boolean isAlt()
-        {
+        boolean isAlt() {
             return alt;
         }
 
-        boolean isControl()
-        {
+        boolean isControl() {
             return ctrl;
         }
 
-        boolean isMeta()
-        {
+        boolean isMeta() {
             return meta;
         }
 
-        void changeState(EventType<KeyEvent> eventType, KeyCode keyCode)
-        {
-            switch (keyCode)
-            {
+        void changeState(EventType<KeyEvent> eventType, KeyCode keyCode) {
+            switch (keyCode) {
                 case SHIFT:
                     shift = modifyState(shift, eventType);
                     break;
@@ -359,8 +314,7 @@ public class FxRobot implements IFxRobot
             }
         }
 
-        private boolean modifyState(boolean state, EventType<KeyEvent> event)
-        {
+        private boolean modifyState(boolean state, EventType<KeyEvent> event) {
             if (event == KeyEvent.KEY_PRESSED)
                 return true;
             else if (event == KeyEvent.KEY_RELEASED)
@@ -370,37 +324,30 @@ public class FxRobot implements IFxRobot
         }
     }
 
-    private class AwtRobot
-    {
+    private class AwtRobot {
         private Robot robot;
 
-        AwtRobot()
-        {
+        AwtRobot() {
             this.robot = null;
         }
 
-        Robot get()
-        {
+        Robot get() {
             if (robot == null)
                 robot = createRobot();
 
             return robot;
         }
 
-        private Robot createRobot()
-        {
+        private Robot createRobot() {
             if (GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance())
                 throw new WebDriverException("This driver require desktop environment with UI and mouse support");
 
             // initialize toolkit
             Toolkit.getDefaultToolkit();
 
-            try
-            {
+            try {
                 return new Robot();
-            }
-            catch (AWTException e)
-            {
+            } catch (AWTException e) {
                 throw new WebDriverException("Unable to create AWT robot: " + e.getMessage(), e);
             }
         }

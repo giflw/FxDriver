@@ -21,25 +21,21 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.server.DriverProvider;
 
-public class FxDriverProvider implements DriverProvider
-{
+public class FxDriverProvider implements DriverProvider {
     private static final String BROWSER_NAME = "javafx";
 
     @Override
-    public Capabilities getProvidedCapabilities()
-    {
+    public Capabilities getProvidedCapabilities() {
         return new DesiredCapabilities(BROWSER_NAME, "", Platform.ANY);
     }
 
     @Override
-    public boolean canCreateDriverInstanceFor(Capabilities capabilities)
-    {
+    public boolean canCreateDriverInstanceFor(Capabilities capabilities) {
         return BROWSER_NAME.equals(capabilities.getBrowserName());
     }
 
     @Override
-    public WebDriver newInstance(Capabilities capabilities)
-    {
+    public WebDriver newInstance(Capabilities capabilities) {
         return new FxDriver(capabilities);
     }
 }

@@ -17,94 +17,77 @@ package com._1c.qa.selenium.fxdriver;
 
 import com._1c.qa.selenium.fxdriver.robot.IMouseFxRobot;
 import javafx.scene.Node;
-
 import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.PointerInput.MouseButton;
 
-public class FxMouse implements Mouse
-{
-    private IMouseFxRobot<?> robot;
+public class FxMouse implements Mouse {
+    private final IMouseFxRobot<?> robot;
 
-    public FxMouse(IMouseFxRobot<?> robot)
-    {
+    public FxMouse(IMouseFxRobot<?> robot) {
         this.robot = robot;
     }
 
     @Override
-    public void click(Coordinates where)
-    {
-        if (where != null)
-        {
-            NodeUtils.scrollIntoView((Node)where.getAuxiliary());
+    public void click(Coordinates where) {
+        if (where != null) {
+            NodeUtils.scrollIntoView((Node) where.getAuxiliary());
             this.robot.click(where.onScreen().x, where.onScreen().y);
-        }
-        else
-        {
+        } else {
             this.robot.click();
         }
     }
 
     @Override
-    public void doubleClick(Coordinates where)
-    {
-        if (where != null)
-        {
-            NodeUtils.scrollIntoView((Node)where.getAuxiliary());
+    public void doubleClick(Coordinates where) {
+        if (where != null) {
+            NodeUtils.scrollIntoView((Node) where.getAuxiliary());
             this.robot.doubleClick(where.onScreen().x, where.onScreen().y);
-        }
-        else
-        {
+        } else {
             this.robot.doubleClick(MouseButton.LEFT);
         }
     }
 
     @Override
-    public void mouseDown(Coordinates where)
-    {
-    	if (where != null) {
-    		this.robot.move(where.onScreen().x, where.onScreen().y);
-    	}
-    	this.robot.mouseDown(PointerInput.MouseButton.LEFT);
+    public void mouseDown(Coordinates where) {
+        if (where != null) {
+            this.robot.move(where.onScreen().x, where.onScreen().y);
+        }
+        this.robot.mouseDown(PointerInput.MouseButton.LEFT);
     }
 
     @Override
-    public void mouseUp(Coordinates where)
-    {
-    	if (where != null) {
-    		this.robot.move(where.onScreen().x, where.onScreen().y);
-    	}
-    	this.robot.mouseUp(PointerInput.MouseButton.LEFT);
+    public void mouseUp(Coordinates where) {
+        if (where != null) {
+            this.robot.move(where.onScreen().x, where.onScreen().y);
+        }
+        this.robot.mouseUp(PointerInput.MouseButton.LEFT);
     }
 
     @Override
-    public void mouseMove(Coordinates where)
-    {
-    	if (where != null) {
-	        NodeUtils.scrollIntoView((Node)where.getAuxiliary());
-	        this.robot.move(where.onScreen().x, where.onScreen().y);
-    	}
+    public void mouseMove(Coordinates where) {
+        if (where != null) {
+            NodeUtils.scrollIntoView((Node) where.getAuxiliary());
+            this.robot.move(where.onScreen().x, where.onScreen().y);
+        }
     }
 
     @Override
-    public void mouseMove(Coordinates where, long xOffset, long yOffset)
-    {
-    	if (where != null) {
-	        NodeUtils.scrollIntoView((Node)where.getAuxiliary());
-	        this.robot.move((int)(where.onScreen().x + xOffset), (int)(where.onScreen().y + yOffset));
-    	} else {
-    		this.robot.move((int) xOffset, (int) yOffset);
-    	}
+    public void mouseMove(Coordinates where, long xOffset, long yOffset) {
+        if (where != null) {
+            NodeUtils.scrollIntoView((Node) where.getAuxiliary());
+            this.robot.move((int) (where.onScreen().x + xOffset), (int) (where.onScreen().y + yOffset));
+        } else {
+            this.robot.move((int) xOffset, (int) yOffset);
+        }
     }
 
     @Override
-    public void contextClick(Coordinates where)
-    {
+    public void contextClick(Coordinates where) {
         if (where == null)
             this.robot.click(PointerInput.MouseButton.RIGHT);
-        else
-        {
+        else {
             NodeUtils.scrollIntoView((Node) where.getAuxiliary());
             this.robot.click(where.onScreen().x, where.onScreen().y, PointerInput.MouseButton.RIGHT);
         }

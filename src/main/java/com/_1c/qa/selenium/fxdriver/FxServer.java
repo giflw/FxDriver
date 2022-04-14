@@ -18,12 +18,10 @@ package com._1c.qa.selenium.fxdriver;
 import org.openqa.grid.internal.utils.configuration.StandaloneConfiguration;
 import org.openqa.selenium.remote.server.SeleniumServer;
 
-public class FxServer
-{
+public class FxServer {
     public static SeleniumServer server;
 
-    public static void start(int port)
-    {
+    public static void start(int port) {
         Thread serverThread = new Thread(() -> {
             StandaloneConfiguration configuration = new StandaloneConfiguration();
             configuration.port = port;
