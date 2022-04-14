@@ -21,7 +21,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.interactions.Coordinates;
 import org.w3c.dom.html.HTMLElement;
 
 import java.util.List;
